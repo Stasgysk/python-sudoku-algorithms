@@ -47,6 +47,14 @@ def check_if_field_solved(field):
     print("some shit")
 
 
+def if_field_solvable():
+    print("some")
+
+
+def if_solved():
+    print("some")
+
+
 def generate_field():
     print("some shit")
 
