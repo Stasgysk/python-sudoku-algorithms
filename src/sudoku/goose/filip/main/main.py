@@ -177,7 +177,7 @@ def generate_field(field):
                     flag = False
 
     if field_size == 9:
-        count = random.randint(30, 50)
+        count = random.randint(45, 60)
     else:
         count = 15
     for i in range(count):
@@ -192,7 +192,10 @@ def generate_field(field):
         else:
             i -= 1
             continue
-
+    for i in range(field_size):
+        for j in range(field_size):
+            if field[i][j] != 0:
+                sudoku_field_generated_positions[i][j] = 1
     # clear_field(field)
     # print(field_size)
     # if field_size == 9:
