@@ -76,8 +76,12 @@ def show_field(field):
         for j in range(field_size):
             pygame.draw.rect(Window, (255, 255, 0), (i * diff, j * diff, diff + 1, diff + 1))
             if field[i][j] != 0:
-                text1 = font.render(str(field[i][j]), 1, (255, 0, 0))
-                Window.blit(text1, (i * diff + 15, j * diff))
+                if field_size == 9:
+                    text1 = font.render(str(field[i][j]), 1, (255, 0, 0))
+                    Window.blit(text1, (i * diff + 15, j * diff))
+                else:
+                    text1 = font.render(str(field[i][j]), 1, (255, 0, 0))
+                    Window.blit(text1, (i * diff + 30, j * diff - 20))
     if field_size == 9:
         for i in range(10):
             if i % 3 == 0:
@@ -260,6 +264,10 @@ def main():
         diff= 500 / 4
         global field_size
         field_size = 4
+        global font
+        global font1
+        font = pygame.font.SysFont("comicsans", 120)
+        font1 = pygame.font.SysFont("comicsans", 100)
     field = sudoku_field_9_x_9
     Window.fill((255, 182, 193))
     generate_field(field)
