@@ -1,3 +1,10 @@
+import pygame
+
+pygame.font.init()
+Window = pygame.display.set_mode((500, 500))
+pygame.display.set_caption("Goose and Filip sudoku masters ;)")
+
+
 def main():
     print("Starting game...")
     print("Generating sudoku field...")
