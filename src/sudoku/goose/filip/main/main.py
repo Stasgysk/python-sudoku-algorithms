@@ -58,6 +58,7 @@ def clear_field(field):
     for i in range(field_size):
         for j in range(field_size):
             field[i][j] = 0
+            sudoku_field_generated_positions[i][j] = 0
     return field
 
 
@@ -239,7 +240,8 @@ def play_game(field):
                     case pygame.K_9:
                         val = 9
                     case pygame.K_BACKSPACE:
-                        field[x][y] = 0
+                        if sudoku_field_generated_positions[x][y] != 1:
+                            field[x][y] = 0
                     case pygame.K_RETURN:
                         generate_field(field)
         if field_size != 9 and val >= 5:
@@ -261,14 +263,16 @@ def main():
         field_type = int(input("Choose your game field 1 or 2:\n1: 9x9\n2: 4x4\n"))
     if field_type == 2:
         global diff
-        diff= 500 / 4
+        diff = 500 / 4
         global field_size
         field_size = 4
         global font
         global font1
         font = pygame.font.SysFont("comicsans", 120)
         font1 = pygame.font.SysFont("comicsans", 100)
-    field = sudoku_field_9_x_9
+        field = sudoku_field_4_x_4
+    else:
+        field = sudoku_field_9_x_9
     Window.fill((255, 182, 193))
     generate_field(field)
     play_game(field)
