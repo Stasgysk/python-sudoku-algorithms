@@ -147,6 +147,7 @@ def play_game(field):
     flag = True
 
     while flag:
+        val = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 flag = False
