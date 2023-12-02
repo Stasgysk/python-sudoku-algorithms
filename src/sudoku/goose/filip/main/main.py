@@ -1,5 +1,6 @@
 import pygame
 import random
+import numpy
 
 pygame.font.init()
 Window = pygame.display.set_mode((504, 504))
@@ -121,6 +122,8 @@ def is_input_valid(x, y, field, val):
         start_y = yy * 2
         start_x_plus = start_x + 2
         start_y_plus = start_y + 2
+    print(start_x, start_x_plus)
+    print(start_y, start_y_plus)
     for pos_x in range(start_x, start_x_plus):
         for pos_y in range(start_y, start_y_plus):
             if field[pos_x][pos_y] == val:
@@ -149,36 +152,77 @@ def is_solvable(field):
 
 
 def generate_field(field):
-    clear_field(field)
-    print(field_size)
+    for i in range(field_size):
+        for j in range(field_size):
+            if field_size == 9:
+                available_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            else:
+                available_numbers = [1, 2, 3, 4]
+            flag = True
+            while flag:
+                if not numpy.any(available_numbers):
+                    clear_field(field)
+                    generate_field(field)
+                    return
+                if field_size == 9:
+                    pos = random.randint(0, 8)
+                else:
+                    pos = random.randint(0, 3)
+                number = available_numbers[pos]
+                available_numbers[pos] = 0
+                if number == 0:
+                    continue
+                if is_input_valid(i, j, field, number):
+                    field[i][j] = number
+                    flag = False
+
     if field_size == 9:
         count = random.randint(30, 50)
     else:
-        count = 5
+        count = 15
     for i in range(count):
-        flag = True
-        while flag:
-            if field_size == 9:
-                x = random.randint(0, 8)
-                y = random.randint(0, 8)
-            else:
-                x = random.randint(0, 3)
-                y = random.randint(0, 3)
-            if field[x][y] != 0:
-                continue
-            else:
-                if field_size == 9:
-                    val = random.randint(1, 9)
-                else:
-                    val = random.randint(1, 4)
-                if is_input_valid(x, y, field, val):
-                    if not is_solvable(field):
-                        clear_field(field)
-                        generate_field(field)
-                        return
-                    flag = False
-                    field[x][y] = val
-                    sudoku_field_generated_positions[x][y] = 1
+        if field_size == 9:
+            x = random.randint(0, 8)
+            y = random.randint(0, 8)
+        else:
+            x = random.randint(0, 3)
+            y = random.randint(0, 3)
+        if field[x][y] != 0:
+            field[x][y] = 0
+        else:
+            i -= 1
+            continue
+
+    # clear_field(field)
+    # print(field_size)
+    # if field_size == 9:
+    #     count = random.randint(30, 50)
+    # else:
+    #     count = 5
+    # for i in range(count):
+    #     flag = True
+    #     while flag:
+    #         if field_size == 9:
+    #             x = random.randint(0, 8)
+    #             y = random.randint(0, 8)
+    #         else:
+    #             x = random.randint(0, 3)
+    #             y = random.randint(0, 3)
+    #         if field[x][y] != 0:
+    #             continue
+    #         else:
+    #             if field_size == 9:
+    #                 val = random.randint(1, 9)
+    #             else:
+    #                 val = random.randint(1, 4)
+    #             if is_input_valid(x, y, field, val):
+    #                 if not is_solvable(field):
+    #                     clear_field(field)
+    #                     generate_field(field)
+    #                     return
+    #                 flag = False
+    #                 field[x][y] = val
+    #                 sudoku_field_generated_positions[x][y] = 1
 
 
 def is_solved(field):
@@ -213,14 +257,22 @@ def play_game(field):
                         if x != 0:
                             x -= 1
                     case pygame.K_RIGHT:
-                        if x != 8:
-                            x += 1
+                        if field_size == 9:
+                            if x != 8:
+                                x += 1
+                        else:
+                            if x != 3:
+                                x += 1
                     case pygame.K_UP:
                         if y != 0:
                             y -= 1
                     case pygame.K_DOWN:
-                        if y != 8:
-                            y += 1
+                        if field_size == 9:
+                            if y != 8:
+                                y += 1
+                        else:
+                            if y != 3:
+                                y += 1
                     case pygame.K_1:
                         val = 1
                     case pygame.K_2:
