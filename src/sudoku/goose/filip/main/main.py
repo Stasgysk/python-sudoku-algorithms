@@ -17,6 +17,18 @@ sudoku_field_9_x_9 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
+sudoku_field_generated_positions = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
 sudoku_field_9_x_9_static = [
     [0, 0, 4, 0, 6, 0, 0, 0, 5],
     [7, 8, 0, 4, 0, 0, 0, 2, 0],
@@ -123,6 +135,7 @@ def generate_field(field):
                         return
                     flag = False
                     field[x][y] = val
+                    sudoku_field_generated_positions[x][y] = 1
 
 
 def is_solved(field):
@@ -183,9 +196,11 @@ def play_game(field):
                         val = 8
                     case pygame.K_9:
                         val = 9
+                    case pygame.K_BACKSPACE:
+                        field[x][y] = 0
                     case pygame.K_RETURN:
                         generate_field(field)
-        if is_input_valid(x, y, field, val):
+        if is_input_valid(x, y, field, val) and sudoku_field_generated_positions[x][y] != 1:
             field[x][y] = val
         show_field(field)
         draw_box(x, y)
