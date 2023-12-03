@@ -311,7 +311,7 @@ def back_tracking(field):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
 
-            if dfs(field):
+            if back_tracking(field):
                 return True
 
             field[x][y] = 0
