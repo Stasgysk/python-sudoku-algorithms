@@ -424,7 +424,7 @@ def main():
                         dfs(field)
                         flag = False
                     case pygame.K_3:
-                        dfs(field)
+                        back_tracking(field)
                         flag = False
                     case pygame.K_4:
                         dfs(field)
