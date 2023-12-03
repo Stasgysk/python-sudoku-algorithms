@@ -88,6 +88,23 @@ def show_start_screen():
     pygame.display.update()
 
 
+def show_game_solving_method():
+    Window.fill((0, 0, 0))
+    text = font.render("Choose mode to play", 1, (255, 0, 0))
+    Window.blit(text, (75, 50))
+    text = font.render("(press 1-4)", 1, (255, 0, 0))
+    Window.blit(text, (75, 100))
+    text = font.render("1: You are playing", 1, (255, 0, 0))
+    Window.blit(text, (75, 150))
+    text = font.render("2: DFS", 1, (255, 0, 0))
+    Window.blit(text, (75, 200))
+    text = font.render("3: Backtracking", 1, (255, 0, 0))
+    Window.blit(text, (75, 250))
+    text = font.render("4: Forward Checking", 1, (255, 0, 0))
+    Window.blit(text, (75, 300))
+    pygame.display.update()
+
+
 def show_field(field):
     for i in range(field_size):
         for j in range(field_size):
@@ -265,7 +282,7 @@ def find_empty_cell(field):
 
 
 def dfs(field):
-    time.sleep(0.1)
+    time.sleep(0.05)
     show_field(field)
     pygame.display.update()
     x, y = find_empty_cell(field)
@@ -283,6 +300,14 @@ def dfs(field):
     return False
 
 
+def back_tracking(field):
+    return dfs(field)
+
+
+def forward_checking(field):
+    return False
+
+
 def play_game(field):
     x = 0
     y = 0
@@ -291,7 +316,6 @@ def play_game(field):
     show_field(field)
 
     flag = True
-
 
     while flag:
         val = 0
@@ -369,6 +393,7 @@ def main():
                     case pygame.K_2:
                         field_type = 2
                         flag = False
+
     if field_type == 2:
         global diff
         diff = 500 / 4
@@ -384,8 +409,26 @@ def main():
     Window.fill((255, 182, 193))
     clear_field(field)
     generate_field(field)
-    #play_game(field)
-    dfs(field)
+
+    flag = True
+
+    show_game_solving_method()
+    while flag:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                match event.key:
+                    case pygame.K_1:
+                        play_game(field)
+                        flag = False
+                    case pygame.K_2:
+                        dfs(field)
+                        flag = False
+                    case pygame.K_3:
+                        dfs(field)
+                        flag = False
+                    case pygame.K_4:
+                        dfs(field)
+                        flag = False
 
     input('Press Enter to exit')
 
