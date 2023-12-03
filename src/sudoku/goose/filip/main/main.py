@@ -33,18 +33,6 @@ sudoku_field_generated_positions = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-# sudoku_field_9_x_9_static = [
-#     [0, 0, 4, 0, 6, 0, 0, 0, 5],
-#     [7, 8, 0, 4, 0, 0, 0, 2, 0],
-#     [0, 0, 2, 6, 0, 1, 0, 7, 8],
-#     [6, 1, 0, 0, 7, 5, 0, 0, 9],
-#     [0, 0, 7, 5, 4, 0, 0, 6, 1],
-#     [0, 0, 1, 7, 5, 0, 9, 3, 0],
-#     [0, 7, 0, 3, 0, 0, 0, 1, 0],
-#     [0, 4, 0, 2, 0, 6, 0, 0, 7],
-#     [0, 2, 0, 0, 0, 7, 4, 0, 0],
-# ]
-
 sudoku_field_4_x_4 = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -66,12 +54,6 @@ def clear_field(field):
     return field
 
 
-# def check_if_field_solved(field):
-#     print("some shit")
-
-
-# def if_field_solvable():
-#     print("some")
 def draw_box(x, y):
     pygame.draw.rect(Window, (255, 0, 0), pygame.Rect(x * diff, y * diff, diff + 3, diff + 3), 4)
 
@@ -139,10 +121,8 @@ def is_input_valid(x, y, field, val):
         return
     for i in range(field_size):
         if field[x][i] == val:
-            # print('SSSS')
             return False
         if field[i][y] == val:
-            # print('SSSS2')
             return False
     if field_size == 9:
         xx = x // 3
@@ -158,12 +138,9 @@ def is_input_valid(x, y, field, val):
         start_y = yy * 2
         start_x_plus = start_x + 2
         start_y_plus = start_y + 2
-        # print("XXXX: ", start_x, " ", start_x_plus, "YYYY: ", start_y, " ", start_y_plus)
-        # print(start_y, " ", start_y_plus)
     for pos_x in range(start_x, start_x_plus):
         for pos_y in range(start_y, start_y_plus):
             if field[pos_x][pos_y] == val:
-                # print("field: ", field[pos_x][pos_y])
                 return False
     return True
 
@@ -233,36 +210,6 @@ def generate_field(field):
         for j in range(field_size):
             if field[i][j] != 0:
                 sudoku_field_generated_positions[i][j] = 1
-    # clear_field(field)
-    # print(field_size)
-    # if field_size == 9:
-    #     count = random.randint(30, 50)
-    # else:
-    #     count = 5
-    # for i in range(count):
-    #     flag = True
-    #     while flag:
-    #         if field_size == 9:
-    #             x = random.randint(0, 8)
-    #             y = random.randint(0, 8)
-    #         else:
-    #             x = random.randint(0, 3)
-    #             y = random.randint(0, 3)
-    #         if field[x][y] != 0:
-    #             continue
-    #         else:
-    #             if field_size == 9:
-    #                 val = random.randint(1, 9)
-    #             else:
-    #                 val = random.randint(1, 4)
-    #             if is_input_valid(x, y, field, val):
-    #                 if not is_solvable(field):
-    #                     clear_field(field)
-    #                     generate_field(field)
-    #                     return
-    #                 flag = False
-    #                 field[x][y] = val
-    #                 sudoku_field_generated_positions[x][y] = 1
 
 
 def is_solved(field):
@@ -318,8 +265,88 @@ def back_tracking(field):
     return False
 
 
+def forward_check(x, y, field, val):
+    # Check constraints for the current x
+    for i in range(9):
+        if i != y and field[x][i] == 0:
+            field[x][i] = -val
+
+    # Check constraints for the current column
+    for i in range(9):
+        if i != x and field[i][y] == 0:
+            field[i][y] = -val
+
+    # Check constraints for the 3x3 grid
+    start_row, start_col = 3 * (x // 3), 3 * (y // 3)
+    for i in range(3):
+        for j in range(3):
+            xx, yy = start_row + i, start_col + j
+            if xx != x and yy != y and field[xx][yy] == 0:
+                field[xx][yy] = -val
+
+
+def undo_forward_check(x, y, field, val):
+    # Undo constraints for the current x
+    for i in range(9):
+        if i != y and field[x][i] == -val:
+            field[x][i] = 0
+
+    # Undo constraints for the current column
+    for i in range(9):
+        if i != x and field[i][y] == -val:
+            field[i][y] = 0
+
+    # Undo constraints for the 3x3 grid
+    start_row, start_col = 3 * (x // 3), 3 * (y // 3)
+    for i in range(3):
+        for j in range(3):
+            xx, yy = start_row + i, start_col + j
+            if xx != x and yy != y and field[xx][yy] == -val:
+                field[xx][yy] = 0
+
+
+def get_all_available_values(x, y, field):
+    list_of_values = []
+    for i in range(1, 10):
+        if is_input_valid(x, y, field, i):
+            list_of_values.append(i)
+    return list_of_values
+
+
 def forward_checking(field):
+    time.sleep(0.05)
+    show_field(field)
+    pygame.display.update()
+    x, y = find_empty_cell(field)
+
+    if x is None and y is None:
+        return True
+
+    list_of_values = get_all_available_values(x, y, field)
+
+    while list_of_values:
+        field[x][y] = list_of_values[0]
+        list_of_values.remove(list_of_values[0])
+
+        if forward_checking(field):
+            return True
+
+        field[x][y] = 0
     return False
+
+    # for number in range(1, 10):
+    #     if is_input_valid(x, y, field, number):
+    #         field[x][y] = number
+    #
+    #         forward_check(x, y, field, number)
+    #
+    #         if forward_checking(field):
+    #             return True
+    #
+    #         field[x][y] = 0
+    #
+    #         undo_forward_check(x, y, field, number)
+    # return False
 
 
 def play_game(field):
@@ -441,7 +468,7 @@ def main():
                         back_tracking(field)
                         flag = False
                     case pygame.K_4:
-                        dfs(field)
+                        forward_checking(field)
                         flag = False
 
     input('Press Enter to exit')
