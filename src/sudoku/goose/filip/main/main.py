@@ -345,9 +345,6 @@ def main():
                     case pygame.K_2:
                         field_type = 2
                         flag = False
-    # field_type = int(input("Choose your game field 1 or 2:\n1: 9x9\n2: 4x4\n"))
-    # while field_type != 1 and field_type != 2:
-    #     field_type = int(input("Choose your game field 1 or 2:\n1: 9x9\n2: 4x4\n"))
     if field_type == 2:
         global diff
         diff = 500 / 4
@@ -364,10 +361,6 @@ def main():
     clear_field(field)
     generate_field(field)
     play_game(field)
-    print("Starting game...")
-    print("Generating sudoku field...")
-    print("Trying to solve...")
-    print("Some...")
 
     input('Press Enter to exit')
 
