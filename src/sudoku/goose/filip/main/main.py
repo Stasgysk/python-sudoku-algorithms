@@ -253,7 +253,6 @@ def if_show(field, show):
         pygame.display.update()
 
 
-
 def dfs(field, show):
     if_show(field, show)
     x, y = find_empty_cell(field)
