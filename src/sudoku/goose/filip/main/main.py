@@ -147,20 +147,15 @@ def is_input_valid(x, y, field, val):
             return False
         if field[i][y] == val:
             return False
-    if field_size == 9:
-        xx = x // 3
-        yy = y // 3
-        start_x = xx * 3
-        start_y = yy * 3
-        start_x_plus = start_x + 3
-        start_y_plus = start_y + 3
-    else:
-        xx = x // 2
-        yy = y // 2
-        start_x = xx * 2
-        start_y = yy * 2
-        start_x_plus = start_x + 2
-        start_y_plus = start_y + 2
+    div = 3
+    if field_size != 9:
+        div = 2
+    xx = x // div
+    yy = y // div
+    start_x = xx * div
+    start_y = yy * div
+    start_x_plus = start_x + div
+    start_y_plus = start_y + div
     for pos_x in range(start_x, start_x_plus):
         for pos_y in range(start_y, start_y_plus):
             if field[pos_x][pos_y] == val:
@@ -173,22 +168,22 @@ def is_solvable(field):
         for j in range(field_size):
             if field[i][j] != 0:
                 solvable = False
-                if field_size == 9:
-                    for val in range(1, 10):
-                        if is_input_valid(i, j, field, val):
-                            solvable = True
-                            break
-                else:
-                    for val in range(1, 5):
-                        if is_input_valid(i, j, field, val):
-                            solvable = True
-                            break
+                max_value = 10
+                if field_size != 9:
+                    max_value = 5
+                for val in range(1, max_value):
+                    if is_input_valid(i, j, field, val):
+                        solvable = True
+                        break
                 if not solvable:
                     return solvable
     return True
 
 
 def generate_field(field):
+    max_value = 8
+    if field_size != 9:
+        max_value = 3
     for i in range(field_size):
         for j in range(field_size):
             if field_size == 9:
@@ -201,10 +196,7 @@ def generate_field(field):
                     clear_field(field)
                     generate_field(field)
                     return
-                if field_size == 9:
-                    pos = random.randint(0, 8)
-                else:
-                    pos = random.randint(0, 3)
+                pos = random.randint(0, max_value)
                 number = available_numbers[pos]
                 available_numbers[pos] = 0
                 if number == 0:
@@ -218,12 +210,8 @@ def generate_field(field):
     else:
         count = 15
     for i in range(count):
-        if field_size == 9:
-            x = random.randint(0, 8)
-            y = random.randint(0, 8)
-        else:
-            x = random.randint(0, 3)
-            y = random.randint(0, 3)
+        x = random.randint(0, max_value)
+        y = random.randint(0, max_value)
         if field[x][y] != 0:
             field[x][y] = 0
         else:
