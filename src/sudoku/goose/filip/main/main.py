@@ -59,30 +59,32 @@ def draw_box(x, y):
 
 
 def show_start_screen():
-    text = font.render("Choose mode to play", 1, (255, 0, 0))
+    font2 = pygame.font.SysFont("comicsans", 40)
+    text = font2.render("Choose mode to play", 1, (255, 0, 0))
     Window.blit(text, (75, 50))
-    text = font.render("(press 1 or 2)", 1, (255, 0, 0))
+    text = font2.render("(press 1 or 2)", 1, (255, 0, 0))
     Window.blit(text, (75, 100))
-    text = font.render("1: 9x9", 1, (255, 0, 0))
+    text = font2.render("1: 9x9", 1, (255, 0, 0))
     Window.blit(text, (75, 150))
-    text = font.render("2: 4x4", 1, (255, 0, 0))
+    text = font2.render("2: 4x4", 1, (255, 0, 0))
     Window.blit(text, (75, 200))
     pygame.display.update()
 
 
 def show_game_solving_method():
+    font2 = pygame.font.SysFont("comicsans", 40)
     Window.fill((0, 0, 0))
-    text = font.render("Choose mode to play", 1, (255, 0, 0))
+    text = font2.render("Choose mode to play", 1, (255, 0, 0))
     Window.blit(text, (75, 50))
-    text = font.render("(press 1-4)", 1, (255, 0, 0))
+    text = font2.render("(press 1-4)", 1, (255, 0, 0))
     Window.blit(text, (75, 100))
-    text = font.render("1: You are playing", 1, (255, 0, 0))
+    text = font2.render("1: You are playing", 1, (255, 0, 0))
     Window.blit(text, (75, 150))
-    text = font.render("2: DFS", 1, (255, 0, 0))
+    text = font2.render("2: DFS", 1, (255, 0, 0))
     Window.blit(text, (75, 200))
-    text = font.render("3: Backtracking", 1, (255, 0, 0))
+    text = font2.render("3: Backtracking", 1, (255, 0, 0))
     Window.blit(text, (75, 250))
-    text = font.render("4: Forward Checking", 1, (255, 0, 0))
+    text = font2.render("4: Forward Checking", 1, (255, 0, 0))
     Window.blit(text, (75, 300))
     pygame.display.update()
 
@@ -263,46 +265,6 @@ def back_tracking(field):
 
             field[x][y] = 0
     return False
-
-
-def forward_check(x, y, field, val):
-    # Check constraints for the current x
-    for i in range(9):
-        if i != y and field[x][i] == 0:
-            field[x][i] = -val
-
-    # Check constraints for the current column
-    for i in range(9):
-        if i != x and field[i][y] == 0:
-            field[i][y] = -val
-
-    # Check constraints for the 3x3 grid
-    start_row, start_col = 3 * (x // 3), 3 * (y // 3)
-    for i in range(3):
-        for j in range(3):
-            xx, yy = start_row + i, start_col + j
-            if xx != x and yy != y and field[xx][yy] == 0:
-                field[xx][yy] = -val
-
-
-def undo_forward_check(x, y, field, val):
-    # Undo constraints for the current x
-    for i in range(9):
-        if i != y and field[x][i] == -val:
-            field[x][i] = 0
-
-    # Undo constraints for the current column
-    for i in range(9):
-        if i != x and field[i][y] == -val:
-            field[i][y] = 0
-
-    # Undo constraints for the 3x3 grid
-    start_row, start_col = 3 * (x // 3), 3 * (y // 3)
-    for i in range(3):
-        for j in range(3):
-            xx, yy = start_row + i, start_col + j
-            if xx != x and yy != y and field[xx][yy] == -val:
-                field[xx][yy] = 0
 
 
 def get_all_available_values(x, y, field):
