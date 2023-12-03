@@ -1,7 +1,9 @@
 import pygame
 import random
 import numpy
+import sys
 
+sys.setrecursionlimit(2500)
 pygame.font.init()
 Window = pygame.display.set_mode((504, 504))
 pygame.display.set_caption("Goose and Filip sudoku masters ;)")
@@ -103,10 +105,14 @@ def show_field(field):
 
 
 def is_input_valid(x, y, field, val):
+    if val == 0:
+        return
     for i in range(field_size):
         if field[x][i] == val:
+            print('SSSS')
             return False
         if field[i][y] == val:
+            print('SSSS2')
             return False
     if field_size == 9:
         xx = x // 3
@@ -122,11 +128,12 @@ def is_input_valid(x, y, field, val):
         start_y = yy * 2
         start_x_plus = start_x + 2
         start_y_plus = start_y + 2
-    print(start_x, start_x_plus)
-    print(start_y, start_y_plus)
+        print("XXXX: ", start_x, " ", start_x_plus, "YYYY: ", start_y, " ", start_y_plus)
+        print(start_y, " ", start_y_plus)
     for pos_x in range(start_x, start_x_plus):
         for pos_y in range(start_y, start_y_plus):
             if field[pos_x][pos_y] == val:
+                print("field: ", field[pos_x][pos_y])
                 return False
     return True
 
@@ -277,12 +284,24 @@ def play_game(field):
                             if y != 3:
                                 y += 1
                     case pygame.K_1:
+                        print("1x: ", x)
+                        print("1y: ", y)
+                        print(sudoku_field_generated_positions[x][y])
                         val = 1
                     case pygame.K_2:
+                        print("2x: ", x)
+                        print("2y: ", y)
+                        print(sudoku_field_generated_positions[x][y])
                         val = 2
                     case pygame.K_3:
+                        print("3x: ", x)
+                        print("3y: ", y)
+                        print(sudoku_field_generated_positions[x][y])
                         val = 3
                     case pygame.K_4:
+                        print("4x: ", x)
+                        print("4y: ", y)
+                        print(sudoku_field_generated_positions[x][y])
                         val = 4
                     case pygame.K_5:
                         val = 5
@@ -314,7 +333,6 @@ def play_game(field):
 def main():
     field_type = int(input("Choose your game field 1 or 2:\n1: 9x9\n2: 4x4\n"))
     while field_type != 1 and field_type != 2:
-        print(field_type)
         field_type = int(input("Choose your game field 1 or 2:\n1: 9x9\n2: 4x4\n"))
     if field_type == 2:
         global diff
@@ -329,6 +347,7 @@ def main():
     else:
         field = sudoku_field_9_x_9
     Window.fill((255, 182, 193))
+    clear_field(field)
     generate_field(field)
     play_game(field)
     print("Starting game...")
