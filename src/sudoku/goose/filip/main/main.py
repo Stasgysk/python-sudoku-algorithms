@@ -2,6 +2,7 @@ import pygame
 import random
 import numpy
 import sys
+import time
 
 sys.setrecursionlimit(2500)
 pygame.font.init()
@@ -255,8 +256,31 @@ def is_solved(field):
     return True
 
 
-def dfs():
-    print("some shit")
+def find_empty_cell(field):
+    for i in range(field_size):
+        for j in range(field_size):
+            if field[i][j] == 0:
+                return i, j
+    return None, None
+
+
+def dfs(field):
+    time.sleep(0.1)
+    show_field(field)
+    pygame.display.update()
+    x, y = find_empty_cell(field)
+
+    if x is None or y is None:
+        return True
+    for number in range(1, 10):
+        if is_input_valid(x, y, field, number):
+            field[x][y] = number
+
+            if dfs(field):
+                return True
+
+            field[x][y] = 0
+    return False
 
 
 def play_game(field):
@@ -360,7 +384,8 @@ def main():
     Window.fill((255, 182, 193))
     clear_field(field)
     generate_field(field)
-    play_game(field)
+    #play_game(field)
+    dfs(field)
 
     input('Press Enter to exit')
 
