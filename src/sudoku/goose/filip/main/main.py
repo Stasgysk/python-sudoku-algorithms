@@ -3,6 +3,7 @@ import random
 import numpy
 import sys
 import time
+import copy
 
 sys.setrecursionlimit(2500)
 pygame.font.init()
@@ -44,6 +45,10 @@ font = pygame.font.SysFont("comicsans", 40)
 font1 = pygame.font.SysFont("comicsans", 20)
 diff = 500 / 9
 field_size = 9
+
+steps_dfs = 0
+steps_bt = 0
+steps_fc = 0
 
 
 def clear_field(field):
@@ -169,12 +174,12 @@ def is_solvable(field):
             if field[i][j] != 0:
                 solvable = False
                 if field_size == 9:
-                    for val in range(1, 9):
+                    for val in range(1, 10):
                         if is_input_valid(i, j, field, val):
                             solvable = True
                             break
                 else:
-                    for val in range(1, 4):
+                    for val in range(1, 5):
                         if is_input_valid(i, j, field, val):
                             solvable = True
                             break
@@ -268,10 +273,11 @@ def dfs(field, show):
     for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
-
+            global steps_dfs
+            steps_dfs += 1
             if dfs(field, show):
                 return True
-
+            steps_dfs += 1
             field[x][y] = 0
     return False
 
@@ -291,10 +297,17 @@ def back_tracking(field, show):
     for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
+            global steps_bt
+            steps_bt += 1
 
-            if is_solvable(field) and back_tracking(field, show):
+            if back_tracking(field, show):
                 return True
 
+            if not is_solvable(field):
+                field[x][y] = 0
+                continue
+
+            steps_bt += 1
             field[x][y] = 0
     return False
 
@@ -338,9 +351,12 @@ def forward_checking(field, show):
     for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
+            global steps_fc
+            steps_fc += 1
             if is_input_valid_for_other_positions(x, y, field, highest):
                 if forward_checking(field, show):
                     return True
+            steps_fc += 1
             field[x][y] = 0
     return False
 
@@ -467,9 +483,9 @@ def main():
                         forward_checking(field, True)
                         flag = False
                     case pygame.K_5:
-                        field1 = field.copy()
-                        field2 = field.copy()
-                        field3 = field.copy()
+                        field1 = copy.deepcopy(field)
+                        field2 = copy.deepcopy(field)
+                        field3 = copy.deepcopy(field)
 
                         start_time1 = time.perf_counter()
                         dfs(field1, False)
@@ -496,6 +512,13 @@ def main():
                         show_time_elapsed(elapsed_time1, elapsed_time2, elapsed_time3)
                         flag = False
 
+                        print(steps_dfs)
+                        print(steps_bt)
+                        print(steps_fc)
+
+                        print(is_solved(field1))
+                        print(is_solved(field2))
+                        print(is_solved(field3))
     input('Press Enter to exit')
 
 
