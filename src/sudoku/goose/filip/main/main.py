@@ -86,6 +86,22 @@ def show_game_solving_method():
     Window.blit(text, (75, 250))
     text = font2.render("4: Forward Checking", 1, (255, 0, 0))
     Window.blit(text, (75, 300))
+    text = font2.render("5: Compare all 3", 1, (255, 0, 0))
+    Window.blit(text, (75, 350))
+    pygame.display.update()
+
+
+def show_time_elapsed(dfs, bt, fc):
+    font2 = pygame.font.SysFont("comicsans", 40)
+    dfs_time = "DFS: " + str(dfs)
+    text = font2.render(dfs_time, 1, (255, 0, 0))
+    Window.blit(text, (4, 50))
+    bt_time = "BT: " + str(bt)
+    text = font2.render(bt_time, 1, (255, 0, 0))
+    Window.blit(text, (4, 100))
+    fc_time = "FC: " + str(fc)
+    text = font2.render(fc_time, 1, (255, 0, 0))
+    Window.blit(text, (4, 150))
     pygame.display.update()
 
 
@@ -230,85 +246,104 @@ def find_empty_cell(field):
     return None, None
 
 
-def dfs(field):
-    time.sleep(0.05)
-    show_field(field)
-    pygame.display.update()
+def if_show(field, show):
+    if show is True:
+        time.sleep(0.05)
+        show_field(field)
+        pygame.display.update()
+
+
+
+def dfs(field, show):
+    if_show(field, show)
     x, y = find_empty_cell(field)
 
     if x is None or y is None:
         return True
-    for number in range(1, 10):
+
+    highest = 10
+
+    if field_size != 9:
+        highest = 5
+
+    for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
 
-            if dfs(field):
-                return True
-
-    return False
-
-
-def back_tracking(field):
-    time.sleep(0.05)
-    show_field(field)
-    pygame.display.update()
-    x, y = find_empty_cell(field)
-
-    if x is None or y is None:
-        return True
-    for number in range(1, 10):
-        if is_input_valid(x, y, field, number):
-            field[x][y] = number
-
-            if back_tracking(field):
+            if dfs(field, show):
                 return True
 
             field[x][y] = 0
     return False
 
 
-def get_all_available_values(x, y, field):
-    list_of_values = []
-    for i in range(1, 10):
-        if is_input_valid(x, y, field, i):
-            list_of_values.append(i)
-    return list_of_values
+def back_tracking(field, show):
+    if_show(field, show)
+    x, y = find_empty_cell(field)
+
+    if x is None or y is None:
+        return True
+
+    highest = 10
+
+    if field_size != 9:
+        highest = 5
+
+    for number in range(1, highest):
+        if is_input_valid(x, y, field, number):
+            field[x][y] = number
+
+            if is_solvable(field) and back_tracking(field, show):
+                return True
+
+            field[x][y] = 0
+    return False
 
 
-def forward_checking(field):
-    time.sleep(0.05)
-    show_field(field)
-    pygame.display.update()
+def is_input_valid_for_other_positions(x, y, field, max_value):
+    for i in range(field_size):
+        if field[x][i] != 0:
+            continue
+        flag = False
+        for j in range(1, max_value):
+            if is_input_valid(x, i, field, j):
+                flag = True
+                break
+        if not flag:
+            return False
+    for i in range(field_size):
+        if field[i][y] != 0:
+            continue
+        flag = False
+        for j in range(1, max_value):
+            if is_input_valid(i, y, field, j):
+                flag = True
+                break
+        if not flag:
+            return False
+    return True
+
+
+def forward_checking(field, show):
+    if_show(field, show)
     x, y = find_empty_cell(field)
 
     if x is None and y is None:
         return True
 
-    list_of_values = get_all_available_values(x, y, field)
+    highest = 10
 
-    while list_of_values:
-        field[x][y] = list_of_values[0]
-        list_of_values.remove(list_of_values[0])
+    if field_size != 9:
+        highest = 5
 
-        if forward_checking(field):
-            return True
-
-        field[x][y] = 0
+    for number in range(1, highest):
+        if is_input_valid(x, y, field, number):
+            field[x][y] = number
+            if is_input_valid_for_other_positions(x, y, field, highest):
+                if forward_checking(field, show):
+                    return True
+            field[x][y] = 0
     return False
-
-    # for number in range(1, 10):
-    #     if is_input_valid(x, y, field, number):
-    #         field[x][y] = number
-    #
-    #         forward_check(x, y, field, number)
-    #
-    #         if forward_checking(field):
-    #             return True
-    #
-    #         field[x][y] = 0
-    #
-    #         undo_forward_check(x, y, field, number)
-    # return False
 
 
 def play_game(field):
@@ -424,13 +459,42 @@ def main():
                         play_game(field)
                         flag = False
                     case pygame.K_2:
-                        dfs(field)
+                        dfs(field, True)
                         flag = False
                     case pygame.K_3:
-                        back_tracking(field)
+                        back_tracking(field, True)
                         flag = False
                     case pygame.K_4:
-                        forward_checking(field)
+                        forward_checking(field, True)
+                        flag = False
+                    case pygame.K_5:
+                        field1 = field.copy()
+                        field2 = field.copy()
+                        field3 = field.copy()
+
+                        start_time1 = time.perf_counter()
+                        dfs(field1, False)
+                        end_time1 = time.perf_counter()
+                        elapsed_time1 = end_time1 - start_time1
+                        elapsed_time1 = "{:.10f}".format(elapsed_time1)
+                        print("DFS: ", elapsed_time1)
+
+                        start_time2 = time.perf_counter()
+                        back_tracking(field2, False)
+                        end_time2 = time.perf_counter()
+                        elapsed_time2 = end_time2 - start_time2
+                        elapsed_time2 = "{:.10f}".format(elapsed_time2)
+                        print("BT: ", elapsed_time2)
+
+                        start_time3 = time.perf_counter()
+                        forward_checking(field3, False)
+                        end_time3 = time.perf_counter()
+                        elapsed_time3 = end_time3 - start_time3
+                        elapsed_time3 = "{:.10f}".format(elapsed_time3)
+                        print("FC: ", elapsed_time3)
+
+                        Window.fill((0, 0, 0))
+                        show_time_elapsed(elapsed_time1, elapsed_time2, elapsed_time3)
                         flag = False
 
     input('Press Enter to exit')
