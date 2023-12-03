@@ -296,12 +296,26 @@ def dfs(field):
             if dfs(field):
                 return True
 
-            field[x][y] = 0
     return False
 
 
 def back_tracking(field):
-    return dfs(field)
+    time.sleep(0.05)
+    show_field(field)
+    pygame.display.update()
+    x, y = find_empty_cell(field)
+
+    if x is None or y is None:
+        return True
+    for number in range(1, 10):
+        if is_input_valid(x, y, field, number):
+            field[x][y] = number
+
+            if dfs(field):
+                return True
+
+            field[x][y] = 0
+    return False
 
 
 def forward_checking(field):
