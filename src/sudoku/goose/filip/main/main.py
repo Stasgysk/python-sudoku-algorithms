@@ -4,6 +4,7 @@ import numpy
 import sys
 import time
 import copy
+from multiprocessing import Pool
 
 sys.setrecursionlimit(2500)
 pygame.font.init()
@@ -223,11 +224,25 @@ def generate_field(field):
                 sudoku_field_generated_positions[i][j] = 1
 
 
-def is_solved(field):
+def is_field_empty(field):
     for i in range(field_size):
         for j in range(field_size):
             if field[i][j] == 0:
-                return False
+                return True
+    return False
+
+
+def is_solved(field):
+    for i in range(field_size-1, -1, -1):
+        for j in range(field_size-1, -1, -1):
+            if sudoku_field_generated_positions[i][j] != 1:
+                number = field[i][j]
+                field[i][j] = 0
+                if not is_input_valid(i, j, field, number):
+                    field[i][j] = number
+                    return False
+                else:
+                    field[i][j] = number
     return True
 
 
@@ -241,7 +256,7 @@ def find_empty_cell(field):
 
 def if_show(field, show):
     if show is True:
-        time.sleep(0.05)
+        time.sleep(0.1)
         show_field(field)
         pygame.display.update()
 
@@ -250,24 +265,47 @@ def dfs(field, show):
     if_show(field, show)
     x, y = find_empty_cell(field)
 
-    if x is None or y is None:
-        return True
-
     highest = 10
+
+    if x is None and y is None:
+        return False
 
     if field_size != 9:
         highest = 5
+    global steps_dfs
 
     for number in range(1, highest):
+        steps_dfs += 1
+        field[x][y] = number
+        dfs(field, show)
+        field[x][y] = 0
         if is_input_valid(x, y, field, number):
             field[x][y] = number
-            global steps_dfs
-            steps_dfs += 1
-            if dfs(field, show):
-                return True
-            steps_dfs += 1
-            field[x][y] = 0
-    return False
+            return True
+    return True
+    # for number in range(1, highest):
+    #     if not is_field_empty(field):
+    #         if is_input_valid(x, y, field, number)
+
+    # for number in range(1, highest):
+    #     if_show(field, show)
+    #     steps_dfs += 1
+    #     field[x][y] = number
+    #     if is_field_empty(field):
+    #         dfs(field, show)
+    #     else:
+    #         field[x][y] = 0
+    #         if is_input_valid(x, y, field, number):
+    #             field[x][y] = number
+    #             break
+    #     if is_solved(field):
+    #         return True
+    # if is_solved(field):
+    #     return True
+    # else:
+    #     steps_dfs += 1
+    #     field[x][y] = 0
+    # return False
 
 
 def back_tracking(field, show):
@@ -290,10 +328,6 @@ def back_tracking(field, show):
 
             if back_tracking(field, show):
                 return True
-
-            if not is_solvable(field):
-                field[x][y] = 0
-                continue
 
             steps_bt += 1
             field[x][y] = 0
@@ -415,7 +449,7 @@ def play_game(field):
         show_field(field)
         draw_box(x, y)
         pygame.display.update()
-        if is_solved(field):
+        if not is_field_empty(field):
             break
     pygame.quit()
 
@@ -434,6 +468,9 @@ def main():
                     case pygame.K_2:
                         field_type = 2
                         flag = False
+            if event.type == pygame.QUIT:
+                flag = False
+                return
 
     if field_type == 2:
         global diff
@@ -456,6 +493,9 @@ def main():
     show_game_solving_method()
     while flag:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                flag = False
+                return
             if event.type == pygame.KEYDOWN:
                 match event.key:
                     case pygame.K_1:
@@ -504,10 +544,20 @@ def main():
                         print(steps_bt)
                         print(steps_fc)
 
+                        for i in range(field_size):
+                            print(field[i])
+                        print()
+                        for i in range(field_size):
+                            print(field1[i])
                         print(is_solved(field1))
                         print(is_solved(field2))
                         print(is_solved(field3))
-    input('Press Enter to exit')
+    flag = True
+    while flag:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                flag = False
+                return
 
 
 if __name__ == "__main__":
