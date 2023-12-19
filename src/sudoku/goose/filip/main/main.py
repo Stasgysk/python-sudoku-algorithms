@@ -112,6 +112,7 @@ def show_time_elapsed(dfs, bt, fc):
 
 
 def show_field(field):
+    Window.fill((0, 0, 0))
     for i in range(field_size):
         for j in range(field_size):
             pygame.draw.rect(Window, (255, 255, 0), (i * diff, j * diff, diff + 1, diff + 1))
@@ -256,60 +257,66 @@ def find_empty_cell(field):
 
 def if_show(field, show):
     if show is True:
-        time.sleep(0.1)
+        time.sleep(0.01)
         show_field(field)
         pygame.display.update()
 
 
 def dfs(field, show):
     if_show(field, show)
+    global steps_dfs
+    steps_dfs += 1
     x, y = find_empty_cell(field)
-
-    highest = 10
 
     if x is None and y is None:
         return False
 
+    highest = 10
+
     if field_size != 9:
         highest = 5
-    global steps_dfs
-
-    for number in range(1, highest):
-        steps_dfs += 1
-        field[x][y] = number
-        dfs(field, show)
-        field[x][y] = 0
-        if is_input_valid(x, y, field, number):
-            field[x][y] = number
-            return True
-    return True
-    # for number in range(1, highest):
-    #     if not is_field_empty(field):
-    #         if is_input_valid(x, y, field, number)
 
     # for number in range(1, highest):
-    #     if_show(field, show)
-    #     steps_dfs += 1
     #     field[x][y] = number
-    #     if is_field_empty(field):
-    #         dfs(field, show)
-    #     else:
+    #     if not dfs(field, show):
     #         field[x][y] = 0
     #         if is_input_valid(x, y, field, number):
     #             field[x][y] = number
-    #             break
-    #     if is_solved(field):
-    #         return True
-    # if is_solved(field):
-    #     return True
-    # else:
-    #     steps_dfs += 1
-    #     field[x][y] = 0
-    # return False
+    #             return True
+    #     else:
+    #         if not dfs(field, show):
+    #             field[x][y] = 0
+    #             if is_input_valid(x, y, field, number):
+    #                 field[x][y] = number
+    #                 return True
+    #             else:
+    #                 return False
+    #
+    # if_show(field, show)
+    # return True
+
+    for number in range(1, highest):
+        if_show(field, show)
+        field[x][y] = number
+        if is_field_empty(field):
+            dfs(field, show)
+        else:
+            field[x][y] = 0
+            if is_input_valid(x, y, field, number):
+                field[x][y] = number
+        if is_solved(field):
+            return True
+    if is_solved(field):
+        return True
+    else:
+        field[x][y] = 0
+    return False
 
 
 def back_tracking(field, show):
     if_show(field, show)
+    global steps_bt
+    steps_bt += 1
     x, y = find_empty_cell(field)
 
     if x is None or y is None:
@@ -323,13 +330,9 @@ def back_tracking(field, show):
     for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
-            global steps_bt
-            steps_bt += 1
 
             if back_tracking(field, show):
                 return True
-
-            steps_bt += 1
             field[x][y] = 0
     return False
 
@@ -360,6 +363,8 @@ def is_input_valid_for_other_positions(x, y, field, max_value):
 
 def forward_checking(field, show):
     if_show(field, show)
+    global steps_fc
+    steps_fc += 1
     x, y = find_empty_cell(field)
 
     if x is None and y is None:
@@ -373,12 +378,9 @@ def forward_checking(field, show):
     for number in range(1, highest):
         if is_input_valid(x, y, field, number):
             field[x][y] = number
-            global steps_fc
-            steps_fc += 1
             if is_input_valid_for_other_positions(x, y, field, highest):
                 if forward_checking(field, show):
                     return True
-            steps_fc += 1
             field[x][y] = 0
     return False
 
@@ -520,7 +522,7 @@ def main():
                         end_time1 = time.perf_counter()
                         elapsed_time1 = end_time1 - start_time1
                         elapsed_time1 = "{:.10f}".format(elapsed_time1)
-                        print("DFS: ", elapsed_time1)
+                        print("DFS:", elapsed_time1)
 
                         start_time2 = time.perf_counter()
                         back_tracking(field2, False)
@@ -536,19 +538,19 @@ def main():
                         elapsed_time3 = "{:.10f}".format(elapsed_time3)
                         print("FC: ", elapsed_time3)
 
-                        Window.fill((0, 0, 0))
-                        show_time_elapsed(elapsed_time1, elapsed_time2, elapsed_time3)
+                        #Window.fill((0, 0, 0))
+                        #show_time_elapsed(elapsed_time1, elapsed_time2, elapsed_time3)
                         flag = False
 
                         print(steps_dfs)
                         print(steps_bt)
                         print(steps_fc)
 
-                        for i in range(field_size):
-                            print(field[i])
-                        print()
-                        for i in range(field_size):
-                            print(field1[i])
+                        # for i in range(field_size):
+                        #     print(field[i])
+                        # print()
+                        # for i in range(field_size):
+                        #     print(field1[i])
                         print(is_solved(field1))
                         print(is_solved(field2))
                         print(is_solved(field3))
