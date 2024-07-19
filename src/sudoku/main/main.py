@@ -9,7 +9,7 @@ from multiprocessing import Pool
 sys.setrecursionlimit(2500)
 pygame.font.init()
 Window = pygame.display.set_mode((504, 504))
-pygame.display.set_caption("Goose and Filip sudoku masters ;)")
+pygame.display.set_caption("Python Sudoku")
 
 sudoku_field_9_x_9 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
